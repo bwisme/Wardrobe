@@ -43,7 +43,7 @@ public class AddClothesActivity extends AppCompatActivity {
     private ColorPicker mColorPicker;
     private boolean hasLoadedPicture;
     private int mSelectedColor;
-    private int mDefaultColorForChooser = 0x3e2723;
+
 
 
     @Override
@@ -141,7 +141,7 @@ public class AddClothesActivity extends AppCompatActivity {
         this.mSelectColorButtonOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mColorPicker.setColor(mDefaultColorForChooser);
+
                 mColorPicker.show();
                 /* On Click listener for the dialog, when the user select the color */
                 Button okColor = (Button) mColorPicker.findViewById(R.id.okColorButton);
@@ -233,14 +233,24 @@ public class AddClothesActivity extends AppCompatActivity {
 
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "WRDB_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+        File image;
+        if (!hasLoadedPicture)
+        {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "WRDB_" + timeStamp + "_";
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            image = File.createTempFile(
+                    imageFileName,  /* prefix */
+                    ".jpg",         /* suffix */
+                    storageDir      /* directory */
+            );
+            hasLoadedPicture = true;
+
+        }
+        else
+        {
+            image = new File(mCurrentPhotoPath);
+        }
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
@@ -285,7 +295,7 @@ public class AddClothesActivity extends AppCompatActivity {
         int photoH = bmOptions.outHeight;
 
         // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH)*2;
+        int scaleFactor = (int)(Math.min(photoW/targetW, photoH/targetH)*1.5);
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
@@ -298,7 +308,7 @@ public class AddClothesActivity extends AppCompatActivity {
         Palette palette = Palette.from(bitmap).generate();
         Palette.Swatch dominantSwatch = palette.getDominantSwatch();
         mColorSelectedView.setBackgroundColor(dominantSwatch.getRgb());
-        mDefaultColorForChooser = dominantSwatch.getRgb();
+        mColorPicker.setColor(dominantSwatch.getRgb());
     }
 
 
