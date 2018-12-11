@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +24,10 @@ import android.widget.ImageView;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -37,8 +41,9 @@ public class AddClothesActivity extends AppCompatActivity {
     private View mColorSelectedView;
     private MaterialButton mSelectColorButton;
     private ColorPicker mColorPicker;
-
-    private int selectedColor;
+    private boolean hasLoadedPicture;
+    private int mSelectedColor;
+    private int mDefaultColorForChooser = 0x3e2723;
 
 
     @Override
@@ -52,7 +57,7 @@ public class AddClothesActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
+        hasLoadedPicture = false;
         mColorPicker = new ColorPicker(AddClothesActivity.this, 62,39,35);
         mClothesImageView = findViewById(R.id.input_add_picture);
         mColorSelectedView = findViewById(R.id.input_color_selected);
@@ -99,6 +104,16 @@ public class AddClothesActivity extends AppCompatActivity {
         builder.setMessage("You will lose all progress!");
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                // delete temp file
+                try
+                {
+                    File toBeDeleted = new File(mCurrentPhotoPath);
+                    toBeDeleted.delete();
+                }
+                catch (Exception ex)
+                {
+
+                }
                 AddClothesActivity.this.finish();
             }
         });
@@ -114,7 +129,8 @@ public class AddClothesActivity extends AppCompatActivity {
     private void onAddClothesDone()
     {
         // TODO read attrs and add to sqlite, return
-
+        //Clothes xx = new Clothes(.......)
+        //helper.add_clothes(xx)
         this.finish();
 
     }
@@ -125,6 +141,7 @@ public class AddClothesActivity extends AppCompatActivity {
         this.mSelectColorButtonOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mColorPicker.setColor(mDefaultColorForChooser);
                 mColorPicker.show();
                 /* On Click listener for the dialog, when the user select the color */
                 Button okColor = (Button) mColorPicker.findViewById(R.id.okColorButton);
@@ -135,7 +152,7 @@ public class AddClothesActivity extends AppCompatActivity {
 
                         /* You can get single channel (value 0-255) */
                         int selectedColor = mColorPicker.getColor();
-                        AddClothesActivity.this.selectedColor = selectedColor;
+                        AddClothesActivity.this.mSelectedColor = selectedColor;
                         AddClothesActivity.this.mColorSelectedView.setBackgroundColor(selectedColor);
                         mColorPicker.dismiss();
                     }
@@ -148,6 +165,7 @@ public class AddClothesActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 AlertDialog.Builder getImageFrom = new AlertDialog.Builder(AddClothesActivity.this);
+
                 getImageFrom.setTitle("Select:");
                 final CharSequence[] opsChars = {getResources().getString(R.string.add_choose_camera),
                         getResources().getString(R.string.add_choose_gallery)};
@@ -159,24 +177,16 @@ public class AddClothesActivity extends AppCompatActivity {
                             dispatchTakePictureIntent();
                         }else
                         if(which == 1){
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            startActivityForResult(Intent.createChooser(intent,
-                                    "Choose From Gallery"), RequestCode.REQUEST_GET_PHOTO_FROM_GALLERY);
+                            dispatchGetFromGalleryIntent();
                         }
                         dialog.dismiss();
                     }
                 });
-
-
-
-
-
+                getImageFrom.show();
 
             }
         };
-
+// TODO
         return true;
     }
 
@@ -193,16 +203,33 @@ public class AddClothesActivity extends AppCompatActivity {
                 break;
             case RequestCode.REQUEST_GET_PHOTO_FROM_GALLERY:
                 if(resultCode == RESULT_OK){
-                    Uri selectedImage = imageReturnedIntent.getData();
-                    mClothesImageView.setImageURI(null);
-                    mClothesImageView.setImageURI(selectedImage);
+
+                    try
+                    {
+                        InputStream inputStream = getContentResolver()
+                                .openInputStream(imageReturnedIntent.getData());
+                        FileOutputStream fileOutputStream = new FileOutputStream(
+                                mCurrentPhotoPath);
+                        copyStream(inputStream, fileOutputStream);
+                        fileOutputStream.close();
+                        inputStream.close();
+                    }
+                    catch (IOException ex)
+                    {
+                        ex.printStackTrace();
+                        return;
+                    }
+                    setPictureOnImageView();
+
                 }
                 break;
         }
     }
 
 
-    String mCurrentPhotoPath;
+    /////////////////////////////////// TAKE PHOTO ////////////////////////////////////////
+
+    private String mCurrentPhotoPath;
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -266,8 +293,51 @@ public class AddClothesActivity extends AppCompatActivity {
 
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         mClothesImageView.setImageBitmap(bitmap);
+
+        // use palette to get vibrant color
+        Palette palette = Palette.from(bitmap).generate();
+        Palette.Swatch dominantSwatch = palette.getDominantSwatch();
+        mColorSelectedView.setBackgroundColor(dominantSwatch.getRgb());
+        mDefaultColorForChooser = dominantSwatch.getRgb();
     }
 
+
+    ///////////////////////////////////////////// FROM GALLERY ////////////////////////////////////////////////
+
+    private void dispatchGetFromGalleryIntent() {
+        Intent fromGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                            intent.setType("image/*");
+//                            intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        if (fromGalleryIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                ex.printStackTrace();
+                return;
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                startActivityForResult(Intent.createChooser(fromGalleryIntent,
+                        "Choose From Gallery"), RequestCode.REQUEST_GET_PHOTO_FROM_GALLERY);
+            }
+
+        }
+    }
+
+
+    private static void copyStream(InputStream input, OutputStream output)
+            throws IOException {
+
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+        }
+    }
 
 
 
