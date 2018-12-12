@@ -7,9 +7,14 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.SaveCallback;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,8 +31,16 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener addClothesButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, AddClothesActivity.class);
-            startActivity(intent);
+            if (activeFragment == communityFragment)
+            {
+                //new post
+            }
+            else
+            {
+                Intent intent = new Intent(MainActivity.this, AddClothesActivity.class);
+                startActivity(intent);
+            }
+
         }
     };
 
@@ -36,19 +49,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         this.closetFragment = ClosetFragment.newInstance();
         this.homeFragment = HomeFragment.newInstance();
         this.settingFragment = SettingFragment.newInstance();
         this.communityFragment = CommunityFragment.newInstance();
 
         activeFragment = homeFragment;
+        addClothesButton = findViewById(R.id.fab_add_clothes);
+        addClothesButton.setOnClickListener(addClothesButtonOnClickListener);
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, homeFragment).commit();
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_closet);
-        addClothesButton = findViewById(R.id.fab_add_clothes);
-        addClothesButton.setOnClickListener(addClothesButtonOnClickListener);
+
 
     }
 
@@ -63,31 +79,35 @@ public class MainActivity extends AppCompatActivity {
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, closetFragment).commit();
                         activeFragment = closetFragment;
+                        addClothesButton.show();
                     }
-                    return true;
+                    break;
                 case R.id.navigation_home:
                     if (activeFragment != homeFragment)
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, homeFragment).commit();
                         activeFragment = homeFragment;
+                        addClothesButton.show();
                     }
-                    return true;
+                    break;
                 case R.id.navigation_community:
                     if (activeFragment != communityFragment)
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, communityFragment).commit();
                         activeFragment = communityFragment;
+                        addClothesButton.show();
                     }
-                    return true;
+                    break;
                 case R.id.navigation_settings:
                     if (activeFragment != settingFragment)
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, settingFragment).commit();
                         activeFragment = settingFragment;
+                        addClothesButton.hide();
                     }
-                    return true;
+                    break;
             }
-            return false;
+            return true;
         }
     };
 

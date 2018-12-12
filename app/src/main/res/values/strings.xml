@@ -33,5 +33,21 @@
 
     <string name="add_choose_camera">Camera</string>
     <string name="add_choose_gallery">Gallery</string>
+    <string name="settings_login">Login</string>
+    <string name="settings_feedback">Feedback</string>
+    <string name="settings_help">Help</string>
+    <string name="login_hint_email">Email</string>
+    <string name="login_hint_Password">Password</string>
+
+    <string name="toast_invalid_user">Invalid Email or Password!</string>
+    <string name="settings_sign_up">Sign Up</string>
+    <string name="login_hint_username">Username</string>
+    <string name="change_password">Change Password</string>
+    <string name="logout">Logout</string>
+    <string name="profile_username">Username</string>
+    <string name="profile_email">Email</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm">Confirm</string>
+    <string name="old_password">Old Password</string>
 
 </resources>

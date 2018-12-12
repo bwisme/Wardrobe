@@ -15,12 +15,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.SaveCallback;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 
 import java.io.File;
@@ -67,6 +71,7 @@ public class AddClothesActivity extends AppCompatActivity {
             mClothesImageView.setOnClickListener(mAddPictureButtonOnClickListener);
             mSelectColorButton.setOnClickListener(mSelectColorButtonOnClickListener);
         }
+
 
     }
 
