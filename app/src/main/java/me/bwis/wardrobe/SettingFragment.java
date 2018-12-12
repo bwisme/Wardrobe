@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.design.button.MaterialButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,11 @@ import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.SignUpCallback;
 import com.avos.avoscloud.UpdatePasswordCallback;
 
+import org.w3c.dom.Text;
+
+import me.bwis.wardrobe.utils.Constant;
+import me.bwis.wardrobe.utils.SharedPreferenceUtils;
+
 public class SettingFragment extends Fragment {
 
 
@@ -26,7 +32,7 @@ public class SettingFragment extends Fragment {
     private View.OnClickListener mHelpOnClickListener;
 
     private View mLoginView;
-
+    private View mLoginTextView;
     private View rootView;
 
 
@@ -52,12 +58,13 @@ public class SettingFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_setting, container, false);
-
-
         mLoginView = rootView.findViewById(R.id.settings_login);
-
+        TextView mLoginTextView = rootView.findViewById(R.id.settings_login_text);
+        if (WardrobeApplication.ApplicationState.IS_LOGGED_IN)
+            mLoginTextView.setText("Hello, "+AVUser.getCurrentUser().getUsername()+"!");
         initOnClickListeners();
-
+        Log.d("SETTING ONCREATEVIEW", "oncreateview");
+        //initLoginStatus();
         return rootView;
     }
 
@@ -165,9 +172,11 @@ public class SettingFragment extends Fragment {
     {
         //fetch and render login user status
         Toast.makeText(getActivity(), "Success login with "+AVUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
+        SharedPreferenceUtils.putString(Constant.PREF_USER_TOKEN, AVUser.getCurrentUser().getSessionToken());
         WardrobeApplication.ApplicationState.IS_LOGGED_IN = true;
         TextView login = rootView.findViewById(R.id.settings_login_text);
-        login.setText("Hello, "+AVUser.getCurrentUser().getUsername()+"!");
+        Log.d("ONLOGGEDIN","settext");
+        login.setTextKeepState("Hello, "+AVUser.getCurrentUser().getUsername()+"!");
     }
 
     private void onLoggedOut()
@@ -175,6 +184,7 @@ public class SettingFragment extends Fragment {
         WardrobeApplication.ApplicationState.IS_LOGGED_IN = false;
         TextView login = rootView.findViewById(R.id.settings_login_text);
         login.setText(R.string.settings_login);
+        SharedPreferenceUtils.instance.edit().remove(Constant.PREF_USER_TOKEN).commit();
     }
 
 
@@ -258,5 +268,32 @@ public class SettingFragment extends Fragment {
             }
         });
     }
+
+    public void initLoginStatus()
+    {
+        String lastSessionToken = SharedPreferenceUtils.getString(Constant.PREF_USER_TOKEN, "");
+        if (lastSessionToken == "" || WardrobeApplication.ApplicationState.IS_LOGGED_IN)
+            return;
+        else
+        {
+            //login
+            AVUser.becomeWithSessionTokenInBackground(lastSessionToken, new LogInCallback<AVUser>() {
+                @Override
+                public void done(AVUser avUser, AVException e)
+                {
+                    if (e == null)
+                    {
+                        onLoggedIn();
+                    }
+                    else
+                    {
+                        Toast.makeText(SettingFragment.this.getActivity(),R.string.toast_invalid_user, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+            });
+        }
+    }
+
 
 }

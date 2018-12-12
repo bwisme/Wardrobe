@@ -49,5 +49,10 @@
     <string name="new_password">New Password</string>
     <string name="confirm">Confirm</string>
     <string name="old_password">Old Password</string>
+    <string name="settings_about">About</string>
+    <string name="options">Options</string>
+    <string name="closet_select_by_type">Select by type</string>
+    <string name="closet_select_by_color">Select by color</string>
+    <string name="closet_select_by_season">Select by season</string>
 
 </resources>

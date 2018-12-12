@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -50,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-
         this.closetFragment = ClosetFragment.newInstance();
         this.homeFragment = HomeFragment.newInstance();
         this.settingFragment = SettingFragment.newInstance();
@@ -59,11 +59,16 @@ public class MainActivity extends AppCompatActivity {
         activeFragment = homeFragment;
         addClothesButton = findViewById(R.id.fab_add_clothes);
         addClothesButton.setOnClickListener(addClothesButtonOnClickListener);
+
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, homeFragment).commit();
+//        getSupportFragmentManager().beginTransaction().add(R.id.main_fragment_container, communityFragment).detach(communityFragment).commit();
+//        getSupportFragmentManager().beginTransaction().add(R.id.main_fragment_container, settingFragment).detach(settingFragment).commit();
+//        getSupportFragmentManager().beginTransaction().add(R.id.main_fragment_container, homeFragment).attach(homeFragment).commit();
+
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        navigation.setSelectedItemId(R.id.navigation_closet);
+        navigation.setSelectedItemId(R.id.navigation_home);
 
 
     }
@@ -78,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                     if (activeFragment != closetFragment)
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, closetFragment).commit();
+//                        getSupportFragmentManager().beginTransaction().detach(activeFragment).attach(closetFragment).commit();
                         activeFragment = closetFragment;
                         addClothesButton.show();
                     }
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     if (activeFragment != homeFragment)
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, homeFragment).commit();
+//                        getSupportFragmentManager().beginTransaction().detach(activeFragment).attach(homeFragment).commit();
                         activeFragment = homeFragment;
                         addClothesButton.show();
                     }
@@ -94,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                     if (activeFragment != communityFragment)
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, communityFragment).commit();
+//                        getSupportFragmentManager().beginTransaction().detach(activeFragment).attach(communityFragment).commit();
                         activeFragment = communityFragment;
                         addClothesButton.show();
                     }
@@ -102,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     if (activeFragment != settingFragment)
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, settingFragment).commit();
+//                        getSupportFragmentManager().beginTransaction().detach(activeFragment).attach(settingFragment).commit();
                         activeFragment = settingFragment;
                         addClothesButton.hide();
                     }
@@ -110,6 +119,18 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     };
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_closet_options:
+                //show options
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 
 

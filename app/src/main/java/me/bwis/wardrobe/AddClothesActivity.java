@@ -1,6 +1,5 @@
 package me.bwis.wardrobe;
 
-import android.app.DownloadManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,16 +14,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.SaveCallback;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 
 import java.io.File;
@@ -33,9 +30,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
-import me.bwis.wardrobe.utils.RequestCode;
+import me.bwis.wardrobe.utils.Constant;
+import me.bwis.wardrobe.utils.Res;
 
 public class AddClothesActivity extends AppCompatActivity {
 
@@ -71,6 +70,7 @@ public class AddClothesActivity extends AppCompatActivity {
             mClothesImageView.setOnClickListener(mAddPictureButtonOnClickListener);
             mSelectColorButton.setOnClickListener(mSelectColorButtonOnClickListener);
         }
+        addItemsToTypeSpinner();
 
 
     }
@@ -195,14 +195,14 @@ public class AddClothesActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         switch(requestCode) {
-            case RequestCode.REQUEST_TAKE_PHOTO:
+            case Constant.REQUEST_TAKE_PHOTO:
                 if(resultCode == RESULT_OK){
 
                     setPictureOnImageView();
                 }
 
                 break;
-            case RequestCode.REQUEST_GET_PHOTO_FROM_GALLERY:
+            case Constant.REQUEST_GET_PHOTO_FROM_GALLERY:
                 if(resultCode == RESULT_OK){
 
                     try
@@ -278,7 +278,7 @@ public class AddClothesActivity extends AppCompatActivity {
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, RequestCode.REQUEST_TAKE_PHOTO);
+                startActivityForResult(takePictureIntent, Constant.REQUEST_TAKE_PHOTO);
             }
         }
     }
@@ -333,7 +333,7 @@ public class AddClothesActivity extends AppCompatActivity {
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 startActivityForResult(Intent.createChooser(fromGalleryIntent,
-                        "Choose From Gallery"), RequestCode.REQUEST_GET_PHOTO_FROM_GALLERY);
+                        "Choose From Gallery"), Constant.REQUEST_GET_PHOTO_FROM_GALLERY);
             }
 
         }
@@ -348,6 +348,18 @@ public class AddClothesActivity extends AppCompatActivity {
         while ((bytesRead = input.read(buffer)) != -1) {
             output.write(buffer, 0, bytesRead);
         }
+    }
+
+    protected void addItemsToTypeSpinner()
+    {
+        Spinner spinner = findViewById(R.id.input_add_type_spinner);
+        ArrayList<String> list = new ArrayList<String>();
+        list.addAll(Res.TYPE_SET);
+        java.util.Collections.sort(list);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
+                list);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
 

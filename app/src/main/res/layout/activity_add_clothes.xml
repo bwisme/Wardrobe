@@ -59,11 +59,13 @@
                 android:textSize="14dp"
                 android:textColor="@color/colorAccent"
                 />
+
             <Spinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/input_add_type"
-                android:layout_alignParentRight="true"></Spinner>
+                android:layout_alignParentRight="true"
+                android:id="@+id/input_add_type_spinner"/>
         </LinearLayout>
 
         <LinearLayout
