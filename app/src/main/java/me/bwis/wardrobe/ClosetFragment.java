@@ -4,19 +4,22 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ClosetFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ClosetFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import me.bwis.wardrobe.dummy.DummyAdapter;
+import me.bwis.wardrobe.dummy.DummyItem;
+
+
+
 public class ClosetFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,6 +29,11 @@ public class ClosetFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private  List<DummyItem> items;
+    private RecyclerView mCategoryRecyclerView;
+    private RecyclerView mClothesRecyclerView;
+
+
 
 //    private OnFragmentInteractionListener mListener;
 
@@ -49,13 +57,51 @@ public class ClosetFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        items = new ArrayList<DummyItem>();
+        items.add(new DummyItem(1,"a"));
+        items.add(new DummyItem(2,"b"));
+        items.add(new DummyItem(3,"c"));
+        items.add(new DummyItem(4,"d"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+        items.add(new DummyItem(5,"e"));
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_closet, container, false);
+        View rootView =  inflater.inflate(R.layout.fragment_closet, container, false);
+        mCategoryRecyclerView = rootView.findViewById(R.id.closet_category_view);
+        mClothesRecyclerView = rootView.findViewById(R.id.closet_clothes_view);
+
+        mCategoryRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity(), LinearLayoutManager.VERTICAL, false));
+        mClothesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
+//
+        DummyAdapter adapter1 = new DummyAdapter(items);
+        DummyAdapter adapter2 = new DummyAdapter(items);
+        mCategoryRecyclerView.setAdapter(adapter1);
+        //mCategoryRecyclerView.setAdapter();
+        mClothesRecyclerView.setAdapter(adapter2);
+        mClothesRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
+        mCategoryRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
+//        mCategoryRecyclerView.setItemAnimator(new DefaultItemAnimator());
+////        mClothesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        return rootView;
+
+
     }
 
 //    // TODO: Rename method, update argument and hook method into UI event

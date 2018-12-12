@@ -68,10 +68,6 @@ public class AddClothesActivity extends AppCompatActivity {
             mSelectColorButton.setOnClickListener(mSelectColorButtonOnClickListener);
         }
 
-
-
-
-
     }
 
     @Override

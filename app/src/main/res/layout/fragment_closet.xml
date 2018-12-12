@@ -7,21 +7,24 @@
     tools:context=".ClosetFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/closet_category_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_closet_fragment"
         android:layout_weight="2"
+        android:scrollbars="vertical"
         android:background="@color/colorGray"/>
 
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/closet_clothes_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_closet_fragment"
+        android:scrollbars="vertical"
         android:layout_weight="1"
         android:background="@color/colorWhite"/>
 
  <!--TODO add recycler view-->
+
 
 
 </LinearLayout>
