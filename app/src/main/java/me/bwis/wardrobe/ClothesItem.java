@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class ClothesItem {
 
+    public long id;
     public String name;
     public String photoPath;
     public String type;
@@ -17,6 +18,7 @@ public class ClothesItem {
     public ClothesItem(String name, String photoPath, String type, ArrayList<String> seasons,
                        int color, String colorType, String storeLocation, String brand, double price)
     {
+        this.id = System.currentTimeMillis();
         this.name = name;
         this.photoPath = photoPath;
         this.type = type;

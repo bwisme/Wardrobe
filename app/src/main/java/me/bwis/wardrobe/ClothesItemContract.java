@@ -2,6 +2,9 @@ package me.bwis.wardrobe;
 
 import android.provider.BaseColumns;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClothesItemContract
 {
 
@@ -25,6 +28,23 @@ public class ClothesItemContract
         public static final String COLUMN_NAME_CLOTHES_NAME = "name";
         public static final String COLUMN_NAME_SEASON = "season";
     }
+
+    public interface ClothesItemInterface
+    {
+
+        List getClothesByType(String type);
+        List getClothesByColor(String colorType);
+        List getClothesBySeason(String season);
+        ClothesItem getClothesById(long id);
+        void addClothes(ClothesItem item);
+        void deleteClothes(long id);
+        void modifyClothes(long id, ClothesItem newItem);
+
+
+
+
+    }
+
 
 
 }

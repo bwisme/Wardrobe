@@ -122,7 +122,7 @@ public class AddClothesActivity extends AppCompatActivity {
     }
 
 
-    private void onAddClothesDone()
+    protected void onAddClothesDone()
     {
         // TODO read attrs and add to sqlite, return
         //Clothes xx = new Clothes(.......)
@@ -131,7 +131,7 @@ public class AddClothesActivity extends AppCompatActivity {
 
     }
 
-    private boolean initOnClickListeners()
+    protected boolean initOnClickListeners()
     {
         // TODO init onClickListeners
         this.mSelectColorButtonOnClickListener = new View.OnClickListener() {
@@ -225,9 +225,9 @@ public class AddClothesActivity extends AppCompatActivity {
 
     /////////////////////////////////// TAKE PHOTO ////////////////////////////////////////
 
-    private String mCurrentPhotoPath;
+    protected String mCurrentPhotoPath;
 
-    private File createImageFile() throws IOException {
+    protected File createImageFile() throws IOException {
         // Create an image file name
         File image;
         if (!hasLoadedPicture)
@@ -254,7 +254,7 @@ public class AddClothesActivity extends AppCompatActivity {
     }
 
 
-    private void dispatchTakePictureIntent() {
+    protected void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -278,7 +278,7 @@ public class AddClothesActivity extends AppCompatActivity {
         }
     }
 
-    private void setPictureOnImageView() {
+    protected void setPictureOnImageView() {
         // Get the dimensions of the View
         int targetW = mClothesImageView.getWidth();
         int targetH = mClothesImageView.getHeight();
@@ -310,7 +310,7 @@ public class AddClothesActivity extends AppCompatActivity {
 
     ///////////////////////////////////////////// FROM GALLERY ////////////////////////////////////////////////
 
-    private void dispatchGetFromGalleryIntent() {
+    protected void dispatchGetFromGalleryIntent() {
         Intent fromGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                            intent.setType("image/*");
 //                            intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -335,7 +335,7 @@ public class AddClothesActivity extends AppCompatActivity {
     }
 
 
-    private static void copyStream(InputStream input, OutputStream output)
+    protected static void copyStream(InputStream input, OutputStream output)
             throws IOException {
 
         byte[] buffer = new byte[1024];
