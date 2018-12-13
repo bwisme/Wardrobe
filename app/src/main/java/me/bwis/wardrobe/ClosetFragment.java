@@ -9,6 +9,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -53,10 +56,7 @@ public class ClosetFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setHasOptionsMenu(true);
 
         items = new ArrayList<DummyItem>();
         items.add(new DummyItem(1,"a"));
@@ -100,10 +100,16 @@ public class ClosetFragment extends Fragment {
 //        mCategoryRecyclerView.setItemAnimator(new DefaultItemAnimator());
 ////        mClothesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         return rootView;
-
-
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+
+        inflater.inflate(R.menu.closet_options, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+    }
 //    // TODO: Rename method, update argument and hook method into UI event
 //    public void onButtonPressed(Uri uri) {
 //        if (mListener != null) {
