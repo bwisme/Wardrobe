@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="70dp"
     android:id="@+id/dummy_linear_layout"
     android:background="@drawable/dummy_selector">
+
+
+
 
     <TextView
         android:layout_width="0dp"
@@ -19,5 +22,12 @@
 
         android:id="@+id/dummy_string"
         android:text=""/>
+
+
+
+
+
+
+
 
 </LinearLayout>
