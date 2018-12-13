@@ -1,10 +1,15 @@
 package me.bwis.wardrobe;
 
+
+import android.annotation.SuppressLint;
+import android.app.DownloadManager;
+import android.content.ContentValues;
+
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -20,13 +25,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,7 +54,7 @@ public class AddClothesActivity extends AppCompatActivity {
     private ColorPicker mColorPicker;
     private boolean hasLoadedPicture;
     private int mSelectedColor;
-
+    protected String mCurrentPhotoPath;
 
 
     @Override
@@ -131,15 +135,90 @@ public class AddClothesActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("WrongViewCast")
+    /****************************************************/
     protected void onAddClothesDone()
     {
-        // TODO read attrs and add to sqlite, return
-        //Clothes xx = new Clothes(.......)
-        //helper.add_clothes(xx)
+        EditText inname;  //输入名称
+        Spinner intype;  //选择type
+        CheckBox Spring;
+        CheckBox Summer;
+        CheckBox Autumn;
+        CheckBox Winter;
+        Button incolor;
+        EditText instore;
+        EditText inbrand;
+        EditText inprice;
+        ClothesItem addClothes;
+        Button confirm;
+
+        inname = (EditText) findViewById(R.id.input_add_name);
+        intype = (Spinner) findViewById(R.id.input_add_type);
+        Spring = (CheckBox) findViewById(R.id.Spring);
+        Summer = (CheckBox) findViewById(R.id.Summer);
+        Autumn = (CheckBox) findViewById(R.id.Autumn);
+        Winter = (CheckBox) findViewById(R.id.Winter);
+        incolor = (Button) findViewById(R.id.button_choose_color);
+        instore = (EditText) findViewById(R.id.input_add_store_location);
+        inbrand = (EditText) findViewById(R.id.input_add_brand);
+        inprice = (EditText) findViewById(R.id.input_add_price);
+        confirm = (Button) findViewById(R.id.action_done);
+
+        ContentValues values = new ContentValues();
+        DatabaseHelper dbHelper1 = new DatabaseHelper(this,"Base_Helper1");
+        SQLiteDatabase Database1 = dbHelper1.getWritableDatabase();
+
+        values.put("id",System.currentTimeMillis());
+        values.put("name",inname.getText().toString());
+        values.put("type",intype.getSelectedItem().toString());
+        values.put("photoPah",mCurrentPhotoPath);
+        //values.put(season,newclothes.seasons);
+        //季节这里再考虑一下
+        values.put("color",mSelectedColor);
+        //缺少colorType
+        values.put("storeLocation",instore.getText().toString());
+        values.put("brand",inbrand.getText().toString());
+        values.put("price",inprice.getText().toString());
+
+        Database1.insert("user",null,values);
+        Database1.close();
+
+        //添加除季节以外的其他部分
+
+        DatabaseHelper dbHelper2 = new DatabaseHelper(this,"Base_Helper2");
+        SQLiteDatabase Database2 = dbHelper2.getWritableDatabase();
+
+        values.put("id",System.currentTimeMillis());
+        if(Spring.isChecked()) {
+            values.put("season", "Spring");
+            Database2.insert("user",null,values);
+        }
+
+        values.put("id",System.currentTimeMillis());
+        if(Spring.isChecked()) {
+            values.put("season", "Summer");
+            Database2.insert("user",null,values);
+        }
+
+        values.put("id",System.currentTimeMillis());
+        if(Spring.isChecked()) {
+            values.put("season", "Autumn");
+            Database2.insert("user",null,values);
+        }
+
+        values.put("id",System.currentTimeMillis());
+        if(Spring.isChecked()) {
+            values.put("season", "Winter");
+            Database2.insert("user",null,values);
+        }
+
+        Database2.close();
 
         this.finish();
 
     }
+    //Where Lee changed
+    /***********************************************************/
 
     protected boolean initOnClickListeners()
     {
@@ -235,7 +314,7 @@ public class AddClothesActivity extends AppCompatActivity {
 
     /////////////////////////////////// TAKE PHOTO ////////////////////////////////////////
 
-    protected String mCurrentPhotoPath;
+
 
     protected File createImageFile() throws IOException {
         // Create an image file name
@@ -308,17 +387,15 @@ public class AddClothesActivity extends AppCompatActivity {
         bmOptions.inSampleSize = scaleFactor;
 
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-
         mClothesImageView.setImageBitmap(bitmap);
-        //Picasso.get().load(mCurrentPhotoPath).fit().centerInside().into(mClothesImageView);
-
 
         // use palette to get vibrant color
         Palette palette = Palette.from(bitmap).generate();
         Palette.Swatch dominantSwatch = palette.getDominantSwatch();
         mColorSelectedView.setBackgroundColor(dominantSwatch.getRgb());
+        mSelectedColor = dominantSwatch.getRgb();
         mColorPicker.setColor(dominantSwatch.getRgb());
-}
+    }
 
 
     ///////////////////////////////////////////// FROM GALLERY ////////////////////////////////////////////////
