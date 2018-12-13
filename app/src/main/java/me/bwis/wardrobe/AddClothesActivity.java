@@ -290,7 +290,6 @@ public class AddClothesActivity extends AppCompatActivity {
 
     protected void setPictureOnImageView() {
         // Get the dimensions of the View
-
         int targetW = mClothesImageView.getWidth();
         int targetH = mClothesImageView.getHeight();
 
