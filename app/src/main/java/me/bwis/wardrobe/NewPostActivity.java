@@ -4,8 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.button.MaterialButton;
@@ -13,22 +13,29 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVFile;
+import com.avos.avoscloud.AVStatus;
+import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.ProgressCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,25 +46,23 @@ import java.util.Date;
 
 import me.bwis.wardrobe.utils.Constant;
 import me.bwis.wardrobe.utils.Res;
+import me.bwis.wardrobe.utils.SharedPreferenceUtils;
 
-public class AddClothesActivity extends AppCompatActivity {
+public class NewPostActivity extends AppCompatActivity
+{
 
     private View.OnClickListener mAddPictureButtonOnClickListener;
-    private View.OnClickListener mSelectColorButtonOnClickListener;
     private ImageView mClothesImageView;
-    private View mColorSelectedView;
-    private MaterialButton mSelectColorButton;
-    private ColorPicker mColorPicker;
     private boolean hasLoadedPicture;
-    private int mSelectedColor;
-
+    private EditText mEditText;
+    private ProgressBar mProgressBar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_clothes);
-
+        setContentView(R.layout.activity_new_post);
+        mEditText = findViewById(R.id.new_post_edit);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
         {
@@ -65,16 +70,17 @@ public class AddClothesActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         hasLoadedPicture = false;
-        mColorPicker = new ColorPicker(AddClothesActivity.this, 62,39,35);
-        mClothesImageView = findViewById(R.id.input_add_picture);
-        mColorSelectedView = findViewById(R.id.input_color_selected);
-        mSelectColorButton = findViewById(R.id.button_choose_color);
+
+        mClothesImageView = findViewById(R.id.new_post_add_picture);
+
         if (initOnClickListeners())
         {
             mClothesImageView.setOnClickListener(mAddPictureButtonOnClickListener);
-            mSelectColorButton.setOnClickListener(mSelectColorButtonOnClickListener);
         }
-        addItemsToTypeSpinner();
+
+        mProgressBar = (ProgressBar) findViewById(R.id.new_post_upload_progress);
+        mProgressBar.setVisibility(View.INVISIBLE);
+
 
 
     }
@@ -92,14 +98,86 @@ public class AddClothesActivity extends AppCompatActivity {
                 onBackPressed();
                 return true;
             case R.id.action_done:
-                onAddClothesDone();
+                try
+                {
+                    onNewPostDone();
+                }
+                catch (IOException e)
+                {
+                    Log.e("OnNewPostDone", e.getMessage());
+                }
+
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void onNewPostDone() throws FileNotFoundException
+    {
+        // post to server
+        if (hasLoadedPicture)
+        {
+            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
+
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File image = null;
+
+            try
+            {
+                image = File.createTempFile(
+                        "WRDB_POST_TEMP",  /* prefix */
+                        ".png",         /* suffix */
+                        storageDir      /* directory */
+
+                );
+                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(image));
+                bitmap.compress(Bitmap.CompressFormat.PNG, 30, bos);
+                bos.flush();
+                bos.close();
+
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            Log.i("OnNewPostDone", "Picture Compress finished");
+            final AVFile file = AVFile.withAbsoluteLocalPath(
+                    AVUser.getCurrentUser().getUsername()+"_Post_"+Long.toString(System.currentTimeMillis())+".png"
+                    , image.getAbsolutePath());
+            final String[] picURL = new String[1];
+            mProgressBar.setVisibility(View.VISIBLE);
+            file.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(AVException e) {
+                    if (e == null)
+                    {
+                        picURL[0] = file.getUrl();
+                        Log.d("OnNewPostDone", file.getUrl());//返回一个唯一的 Url 地址
+                        if (!picURL[0].isEmpty())
+                        {
+
+                            AVStatus status = AVStatus.createStatus(picURL[0], mEditText.getText().toString());
+                            status.setInboxType(AVStatus.INBOX_TYPE.TIMELINE.toString());
+                            AVStatus.sendStatusToFollowersInBackgroud(status, new SaveCallback() {
+                                @Override
+                                public void done(AVException avException) {
+                                    Log.i("OnNewPostDone", "Send status finished.");
+                                }
+                            });
+                        }
+                    }
+                }
+            }, new ProgressCallback() {
+                @Override
+                public void done(Integer integer) {
+                    mProgressBar.setProgress(integer);
+                }
+            });
 
 
+        }
+
+        this.finish();
+    }
 
 
     @Override
@@ -119,7 +197,7 @@ public class AddClothesActivity extends AppCompatActivity {
                 {
 
                 }
-                AddClothesActivity.this.finish();
+                NewPostActivity.this.finish();
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -131,46 +209,14 @@ public class AddClothesActivity extends AppCompatActivity {
     }
 
 
-    protected void onAddClothesDone()
-    {
-        // TODO read attrs and add to sqlite, return
-        //Clothes xx = new Clothes(.......)
-        //helper.add_clothes(xx)
-
-        this.finish();
-
-    }
-
     protected boolean initOnClickListeners()
     {
-        // TODO init onClickListeners
-        this.mSelectColorButtonOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                mColorPicker.show();
-                /* On Click listener for the dialog, when the user select the color */
-                Button okColor = (Button) mColorPicker.findViewById(R.id.okColorButton);
-
-                okColor.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        /* You can get single channel (value 0-255) */
-                        int selectedColor = mColorPicker.getColor();
-                        AddClothesActivity.this.mSelectedColor = selectedColor;
-                        AddClothesActivity.this.mColorSelectedView.setBackgroundColor(selectedColor);
-                        mColorPicker.dismiss();
-                    }
-                });
-            }
-        };
 
         this.mAddPictureButtonOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder getImageFrom = new AlertDialog.Builder(AddClothesActivity.this);
+                AlertDialog.Builder getImageFrom = new AlertDialog.Builder(NewPostActivity.this);
 
                 getImageFrom.setTitle("Select:");
                 final CharSequence[] opsChars = {getResources().getString(R.string.add_choose_camera),
@@ -192,7 +238,7 @@ public class AddClothesActivity extends AppCompatActivity {
 
             }
         };
-// TODO
+
         return true;
     }
 
@@ -290,7 +336,6 @@ public class AddClothesActivity extends AppCompatActivity {
 
     protected void setPictureOnImageView() {
         // Get the dimensions of the View
-
         int targetW = mClothesImageView.getWidth();
         int targetH = mClothesImageView.getHeight();
 
@@ -309,17 +354,9 @@ public class AddClothesActivity extends AppCompatActivity {
         bmOptions.inSampleSize = scaleFactor;
 
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-
         mClothesImageView.setImageBitmap(bitmap);
-        //Picasso.get().load(mCurrentPhotoPath).fit().centerInside().into(mClothesImageView);
 
-
-        // use palette to get vibrant color
-        Palette palette = Palette.from(bitmap).generate();
-        Palette.Swatch dominantSwatch = palette.getDominantSwatch();
-        mColorSelectedView.setBackgroundColor(dominantSwatch.getRgb());
-        mColorPicker.setColor(dominantSwatch.getRgb());
-}
+    }
 
 
     ///////////////////////////////////////////// FROM GALLERY ////////////////////////////////////////////////
@@ -357,18 +394,6 @@ public class AddClothesActivity extends AppCompatActivity {
         while ((bytesRead = input.read(buffer)) != -1) {
             output.write(buffer, 0, bytesRead);
         }
-    }
-
-    protected void addItemsToTypeSpinner()
-    {
-        Spinner spinner = findViewById(R.id.input_add_type_spinner);
-        ArrayList<String> list = new ArrayList<String>();
-        list.addAll(Res.TYPE_SET);
-        java.util.Collections.sort(list);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
-                list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
     }
 
 
