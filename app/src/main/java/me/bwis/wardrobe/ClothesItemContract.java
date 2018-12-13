@@ -36,9 +36,9 @@ public class ClothesItemContract
         List getClothesByColor(String colorType);
         List getClothesBySeason(String season);
         ClothesItem getClothesById(long id);
-        void addClothes(ClothesItem item);
+
         void deleteClothes(long id);
-        void modifyClothes(long id, ClothesItem newItem);
+
 
 
 
