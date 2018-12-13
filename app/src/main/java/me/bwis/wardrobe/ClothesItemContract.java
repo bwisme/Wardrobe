@@ -1,5 +1,6 @@
 package me.bwis.wardrobe;
 
+import android.database.Cursor;
 import android.provider.BaseColumns;
 
 import java.util.ArrayList;
@@ -35,9 +36,10 @@ public class ClothesItemContract
         List getClothesByType(String type);
         List getClothesByColor(String colorType);
         List getClothesBySeason(String season);
-        ClothesItem getClothesById(long id);
+        Cursor getClothesById(long id);
 
         void deleteClothes(long id);
+        Cursor getClothesById_Season(long id);
 
 
 
