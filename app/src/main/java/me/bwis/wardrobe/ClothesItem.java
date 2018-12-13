@@ -29,4 +29,9 @@ public class ClothesItem {
         this.brand = brand;
         this.price = price;
     }
+
+    public ClothesItem(){
+
+    }
+
 }
