@@ -47,7 +47,6 @@ public class DummyAdapter extends RecyclerView.Adapter<DummyAdapter.DummyViewHol
 
         TextView intView;
         TextView stringView;
-//        CardView cardView;
 
         public DummyViewHolder(@NonNull View itemView) {
             super(itemView);
