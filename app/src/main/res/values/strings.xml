@@ -54,12 +54,5 @@
     <string name="closet_select_by_type">Select by type</string>
     <string name="closet_select_by_color">Select by color</string>
     <string name="closet_select_by_season">Select by season</string>
-    <string name="community_following">Following</string>
-    <string name="community_my_post">My Post</string>
-    <string name="community_search_users">Search Users</string>
-    <string name="new_post_hint">New Post</string>
-    <string name="new_post_button">Post</string>
-    <string name="title_new_post">New Post</string>
-    <string name="follow">Follow</string>
 
 </resources>
