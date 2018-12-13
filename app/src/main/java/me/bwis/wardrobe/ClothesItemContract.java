@@ -1,5 +1,6 @@
 package me.bwis.wardrobe;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
@@ -36,10 +37,10 @@ public class ClothesItemContract
         List getClothesByType(String type);
         List getClothesByColor(String colorType);
         List getClothesBySeason(String season);
-        List getClothesById(long id);
-        void addClothes(ClothesItem item);
+        Cursor getClothesById(long id);
+        Cursor getClothesById_Season(long id);
         void deleteClothes(long id);
-        void modifyClothes(long id, ClothesItem newItem);
+
 
     }
 
