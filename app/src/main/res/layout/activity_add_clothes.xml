@@ -89,24 +89,28 @@
 
 
             <CheckBox
+                android:id="@+id/Spring"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/season_spring"
                 android:textColor="@color/colorAccent"
                 />
             <CheckBox
+                android:id="@+id/Summer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/season_summer"
                 android:textColor="@color/colorAccent"
                 />
             <CheckBox
+                android:id="@+id/Autumn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/season_autumn"
                 android:textColor="@color/colorAccent"
                 />
             <CheckBox
+                android:id="@+id/Winter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/season_winter"
