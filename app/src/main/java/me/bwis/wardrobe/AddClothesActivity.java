@@ -1,11 +1,10 @@
 package me.bwis.wardrobe;
 
-<<<<<<< HEAD
+
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.ContentValues;
-=======
->>>>>>> origin/master
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
