@@ -28,12 +28,14 @@ public class WardrobeApplication extends Application
         AVOSCloud.setDebugLogEnabled(true);
         SharedPreferenceUtils.setInstance(getApplicationContext().getSharedPreferences(Constant.PREF_FILE, MODE_PRIVATE));
         ApplicationState.IS_LOGGED_IN = false;
+        ApplicationState.CURRENT_CATEGORY = SharedPreferenceUtils.instance.getInt(Constant.PREF_CATEGORY, Constant.CATEGORY_TYPE);
         initPreferences();
     }
 
     private void initPreferences()
     {
         initLoginState();
+//        this.deleteDatabase(ClothesItemDBHelper.DB_NAME); // danger!!!!
         //Type set
         Set<String> typeSet = SharedPreferenceUtils.getStringSet(Constant.PREF_TYPE_SET, new HashSet<String>());
         if (typeSet.isEmpty())
@@ -77,6 +79,7 @@ public class WardrobeApplication extends Application
     public static class ApplicationState
     {
         public static boolean IS_LOGGED_IN;
+        public static int CURRENT_CATEGORY;
     }
 
     private void initLoginState()

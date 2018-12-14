@@ -36,10 +36,22 @@ public class SharedPreferenceUtils
     {
         if (instance == null)
             return;
-        Set<String> set = SharedPreferenceUtils.getStringSet(key, new HashSet<String>());
+        Set<String> set = new HashSet<>(SharedPreferenceUtils.getStringSet(key, new HashSet<String>()));
         set.add(value);
         instance.edit().putStringSet(key, set).apply();
     }
+
+    public static void removeStringFromStringSet(String key, String value)
+    {
+        if (instance == null)
+            return;
+        Set<String> set = new HashSet<>(SharedPreferenceUtils.getStringSet(key, new HashSet<String>()));
+        if (set.isEmpty())
+            return;
+        set.remove(value);
+        instance.edit().putStringSet(key, set).apply();
+    }
+
 
     public static void putStringSet(String key, Set<String> values)
     {

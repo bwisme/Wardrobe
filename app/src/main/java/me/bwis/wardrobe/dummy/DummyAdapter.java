@@ -1,7 +1,6 @@
 package me.bwis.wardrobe.dummy;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,7 @@ public class DummyAdapter extends RecyclerView.Adapter<DummyAdapter.DummyViewHol
     @NonNull
     @Override
     public DummyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new DummyViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.dummy_item_layout,
+        return new DummyViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_dummy,
                 viewGroup, false));
     }
 

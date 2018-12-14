@@ -1,7 +1,9 @@
 package me.bwis.wardrobe;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -15,14 +17,19 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.squareup.picasso.Picasso;
@@ -39,6 +46,10 @@ import java.util.Date;
 
 import me.bwis.wardrobe.utils.Constant;
 import me.bwis.wardrobe.utils.Res;
+import me.bwis.wardrobe.utils.SharedPreferenceUtils;
+
+import static me.bwis.wardrobe.ClothesItemContract.ClothesSeasonEntry;
+import static me.bwis.wardrobe.ClothesItemContract.ClothesItemEntry;
 
 public class AddClothesActivity extends AppCompatActivity {
 
@@ -78,6 +89,7 @@ public class AddClothesActivity extends AppCompatActivity {
 
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -133,9 +145,105 @@ public class AddClothesActivity extends AppCompatActivity {
 
     protected void onAddClothesDone()
     {
-        // TODO read attrs and add to sqlite, return
-        //Clothes xx = new Clothes(.......)
-        //helper.add_clothes(xx)
+        EditText inName;  //输入名称
+        Spinner inType;  //选择type
+        CheckBox checkSpring;
+        CheckBox checkSummer;
+        CheckBox checkAutumn;
+        CheckBox checkWinter;
+        Button inColor;
+        EditText inStore;
+        EditText inBrand;
+        EditText inPrice;
+        ClothesItem addClothes;
+
+
+        inName = (EditText) findViewById(R.id.input_add_name);
+        inType = (Spinner) findViewById(R.id.input_add_type_spinner);
+        checkSpring = (CheckBox) findViewById(R.id.add_checkbox_spring);
+        checkSummer = (CheckBox) findViewById(R.id.add_checkbox_summer);
+        checkAutumn = (CheckBox) findViewById(R.id.add_checkbox_autumn);
+        checkWinter = (CheckBox) findViewById(R.id.add_checkbox_winter);
+        inColor = (Button) findViewById(R.id.button_choose_color);
+        inStore = (EditText) findViewById(R.id.input_add_store_location);
+        inBrand = (EditText) findViewById(R.id.input_add_brand);
+        inPrice = (EditText) findViewById(R.id.input_add_price);
+
+        if (!hasLoadedPicture)
+        {
+            Toast.makeText(this, "Please upload a picture", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!(checkSpring.isChecked() || checkSummer.isChecked() || checkAutumn.isChecked()
+                    ||checkWinter.isChecked()))
+        {
+            Toast.makeText(this, "Please choose season", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Long currentID = System.currentTimeMillis();
+
+
+        ContentValues values = new ContentValues();
+        ClothesItemDBHelper dbHelper = new ClothesItemDBHelper(getApplication());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        values.put(ClothesItemEntry._ID,currentID);
+        values.put(ClothesItemEntry.COLUMN_NAME_CLOTHES_NAME,inName.getText().toString());
+        values.put(ClothesItemEntry.COLUMN_NAME_TYPE,inType.getSelectedItem().toString());
+        values.put(ClothesItemEntry.COLUMN_NAME_PHOTO_PATH,mCurrentPhotoPath);
+
+        values.put(ClothesItemEntry.COLUMN_NAME_COLOR,mSelectedColor);
+        // TODO 缺少colorType
+        values.put(ClothesItemEntry.COLUMN_NAME_STORE_LOCATION,inStore.getText().toString());
+        values.put(ClothesItemEntry.COLUMN_NAME_BRAND,inBrand.getText().toString());
+        values.put(ClothesItemEntry.COLUMN_NAME_PRICE,Double.parseDouble(inPrice.getText().toString()));
+
+        long ret = db.insert(ClothesItemEntry.TABLE_NAME,null,values);
+        Log.d("AddClothesActivity", "add:"+Long.toString(ret));
+
+        //添加除季节以外的其他部分
+
+
+
+        if(checkSpring.isChecked())
+        {
+            values = new ContentValues();
+            values.put(ClothesSeasonEntry._ID,currentID);
+            values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Spring");
+            db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
+        }
+
+        if (checkSpring.isChecked())
+        {
+            values = new ContentValues();
+            values.put(ClothesSeasonEntry._ID, currentID);
+            values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Spring");
+            db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
+        }
+        if (checkSummer.isChecked())
+        {
+            values = new ContentValues();
+            values.put(ClothesSeasonEntry._ID, currentID);
+            values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Summer");
+            db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
+        }
+        if (checkAutumn.isChecked())
+        {
+            values = new ContentValues();
+            values.put(ClothesSeasonEntry._ID, currentID);
+            values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Autumn");
+            db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
+        }
+        if (checkWinter.isChecked())
+        {
+            values = new ContentValues();
+            values.put(ClothesSeasonEntry._ID, currentID);
+            values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Winter");
+            db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
+        }
+
 
         this.finish();
 
@@ -362,7 +470,7 @@ public class AddClothesActivity extends AppCompatActivity {
     {
         Spinner spinner = findViewById(R.id.input_add_type_spinner);
         ArrayList<String> list = new ArrayList<String>();
-        list.addAll(Res.TYPE_SET);
+        list.addAll(SharedPreferenceUtils.getStringSet(Constant.PREF_TYPE_SET, Res.TYPE_SET));
         java.util.Collections.sort(list);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                 list);

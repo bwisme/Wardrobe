@@ -30,5 +30,8 @@ public class ClothesItem {
         this.price = price;
     }
 
-    public ClothesItem() {}
+    public ClothesItem()
+    {
+        this.seasons = new ArrayList<>();
+    }
 }

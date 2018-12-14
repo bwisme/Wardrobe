@@ -17,7 +17,7 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
-        <me.bwis.wardrobe.utils.SquareImageView
+        <ImageView
             android:id="@+id/input_add_picture"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -93,24 +93,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/season_spring"
+                android:id="@+id/add_checkbox_spring"
                 android:textColor="@color/colorAccent"
                 />
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/season_summer"
+                android:id="@+id/add_checkbox_summer"
                 android:textColor="@color/colorAccent"
                 />
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/season_autumn"
+                android:id="@+id/add_checkbox_autumn"
                 android:textColor="@color/colorAccent"
                 />
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/season_winter"
+                android:id="@+id/add_checkbox_winter"
                 android:textColor="@color/colorAccent"
                 />
 

@@ -1,6 +1,5 @@
 package me.bwis.wardrobe;
 
-import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avos.avoscloud.AVStatus;
-import com.avos.avoscloud.AVUser;
 import com.squareup.picasso.Picasso;
 
 
@@ -32,7 +30,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.TimeLi
     @Override
     public TimeLineViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
-        return new TimeLineViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.timeline_item_layout,
+        return new TimeLineViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_timeline,
                 viewGroup, false));
     }
 

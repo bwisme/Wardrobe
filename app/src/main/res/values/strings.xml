@@ -61,5 +61,7 @@
     <string name="new_post_button">Post</string>
     <string name="title_new_post">New Post</string>
     <string name="follow">Follow</string>
+    <string name="dialog_new_type_title">New Type</string>
+    <string name="dialog_rename_type_title">New Name</string>
 
 </resources>
