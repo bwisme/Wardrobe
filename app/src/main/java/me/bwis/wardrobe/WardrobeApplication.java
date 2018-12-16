@@ -10,12 +10,23 @@ import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import me.bwis.wardrobe.utils.Constant;
 import me.bwis.wardrobe.utils.Res;
 import me.bwis.wardrobe.utils.SharedPreferenceUtils;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class WardrobeApplication extends Application
 {
@@ -30,6 +41,7 @@ public class WardrobeApplication extends Application
         ApplicationState.IS_LOGGED_IN = false;
         ApplicationState.IS_SHOWING_ALL_TYPE = false;
         ApplicationState.CURRENT_CATEGORY = SharedPreferenceUtils.instance.getInt(Constant.PREF_CATEGORY, Constant.CATEGORY_TYPE);
+        getWeather();
         initPreferences();
     }
 
@@ -82,6 +94,7 @@ public class WardrobeApplication extends Application
         public static boolean IS_LOGGED_IN;
         public static int CURRENT_CATEGORY;
         public static boolean IS_SHOWING_ALL_TYPE;
+        public static HashMap<String, String> weatherStatus = new HashMap<>();
     }
 
     private void initLoginState()
@@ -107,6 +120,48 @@ public class WardrobeApplication extends Application
                 }
             });
         }
+    }
+
+    private void getWeather()
+    {
+        //1.创建OkHttpClient对象
+        OkHttpClient okHttpClient = new OkHttpClient();
+        //2.创建Request对象，设置一个url地址（百度地址）,设置请求方式。
+        Request request = new Request.Builder().url("http://t.weather.sojson.com/api/weather/city/101010100").method("GET",null).build();
+        //3.创建一个call对象,参数就是Request请求对象
+        Call call = okHttpClient.newCall(request);
+        //4.请求加入调度，重写回调方法
+        call.enqueue(new Callback() {
+            //请求失败执行的方法
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+            //请求成功执行的方法
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try
+                {
+                    JSONObject jsonObject = new JSONObject(response.body().string());
+                    JSONObject cityInfo = jsonObject.getJSONObject("cityInfo");
+                    ApplicationState.weatherStatus.put("city", cityInfo.getString("city"));
+                    JSONArray forecast = jsonObject.getJSONObject("data").getJSONArray("forecast");
+                    JSONObject today = forecast.getJSONObject(0);
+                    ApplicationState.weatherStatus.put("todayMax", today.getString("high").split(" ")[1]);
+                    ApplicationState.weatherStatus.put("todayMin", today.getString("low").split(" ")[1]);
+                    ApplicationState.weatherStatus.put("type", today.getString("type"));
+                    ApplicationState.weatherStatus.put("notice", today.getString("notice"));
+                    JSONObject tomorrow = forecast.getJSONObject(1);
+                    ApplicationState.weatherStatus.put("tomorrowMax", tomorrow.getString("high").split(" ")[1]);
+                    ApplicationState.weatherStatus.put("tomorrowMin", tomorrow.getString("low").split(" ")[1]);
+
+
+                } catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
 

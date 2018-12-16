@@ -198,7 +198,7 @@ public class AddClothesActivity extends AppCompatActivity {
         values.put(ClothesItemEntry.COLUMN_NAME_PHOTO_PATH, this.mCurrentPhotoPath);
 
         values.put(ClothesItemEntry.COLUMN_NAME_COLOR,mSelectedColor);
-        // TODO 缺少colorType
+        values.put(ClothesItemEntry.COLUMN_NAME_COLOR_TYPE, Constant.getNearestColorName(mSelectedColor));
         values.put(ClothesItemEntry.COLUMN_NAME_STORE_LOCATION,inStore.getText().toString());
         values.put(ClothesItemEntry.COLUMN_NAME_BRAND,inBrand.getText().toString());
         values.put(ClothesItemEntry.COLUMN_NAME_PRICE,Double.parseDouble(inPrice.getText().toString()));
@@ -480,7 +480,6 @@ public class AddClothesActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mTypeSpinner.setAdapter(adapter);
     }
-
 
 
 }

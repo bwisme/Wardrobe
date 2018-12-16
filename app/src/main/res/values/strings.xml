@@ -66,6 +66,7 @@
     <string name="delete">Delete</string>
     <string name="closet_select_all_type">Show all types</string>
     <string name="title_modify_clothes">Modify Clothes</string>
+    <string name="try_these_today">Try These Today!</string>
 
 
 </resources>

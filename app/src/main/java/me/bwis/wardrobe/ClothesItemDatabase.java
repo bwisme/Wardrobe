@@ -147,7 +147,7 @@ public class ClothesItemDatabase implements ClothesItemContract.ClothesItemInter
             add.type = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_TYPE));
             add.storeLocation = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_STORE_LOCATION));
             add.color = result.getInt(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_COLOR));
-            //add.colorType = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_COLOR_TYPE));
+            add.colorType = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_COLOR_TYPE));
             add.brand = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_BRAND));
             add.price = result.getDouble(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_PRICE));
             Cursor Season = db.query(ClothesSeasonEntry.TABLE_NAME, null, ClothesSeasonEntry._ID+"=?",new String[]{Long.toString(add.id)},
@@ -233,5 +233,21 @@ public class ClothesItemDatabase implements ClothesItemContract.ClothesItemInter
         db.execSQL(query);
     }
 
+
+    public List getRandomClothes(int number)
+    {
+        Cursor result = this.db.query(ClothesItemEntry.TABLE_NAME+" Order BY RANDOM() LIMIT "+Integer.toString(number),
+                new String[] { "*" }, null, null, null, null, null);
+        ArrayList<ClothesItem> output = new ArrayList<>();
+        while (result.moveToNext()) {
+            ClothesItem add = new ClothesItem();
+            add.id = result.getLong(result.getColumnIndex(ClothesItemEntry._ID));
+            add.name = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_CLOTHES_NAME));
+            add.photoPath = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_PHOTO_PATH));
+            output.add(add);
+
+        }
+        return output;
+    }
 
 }
