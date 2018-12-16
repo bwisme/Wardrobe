@@ -8,14 +8,28 @@
         android:icon="@drawable/ic_menu_white_24dp">
 
         <menu>
-
             <item android:title="@string/closet_select_by_type"
                 android:id="@+id/closet_option_by_type"/>
             <item android:title="@string/closet_select_by_color"
                 android:id="@+id/closet_option_by_color"/>
             <item android:title="@string/closet_select_by_season"
                 android:id="@+id/closet_option_by_season"/>
+            <item android:title="@string/closet_select_all_type"
+                android:id="@+id/closet_option_all_type"/>
         </menu>
 
     </item>
+    <item
+        android:title="@string/delete"
+        android:id="@+id/action_closet_delete"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_delete_black_24dp" />
+    <item
+        android:title="@string/confirm"
+        android:id="@+id/action_closet_delete_confirm"
+        app:showAsAction="always"
+        android:visible="false"
+        android:icon="@drawable/ic_done_white_24dp"/>
+
+
 </menu>

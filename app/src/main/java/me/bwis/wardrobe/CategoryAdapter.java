@@ -37,7 +37,7 @@ public class CategoryAdapter extends RecyclerView.Adapter
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
-        Log.d("CategoryAdapter", "onCreateViewHolder");
+//        Log.d("CategoryAdapter", "onCreateViewHolder");
         if (i == Constant.CATEGORY_FOOTER)
             return new AddCategoryViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(
                     R.layout.item_add_category, viewGroup, false));
@@ -54,6 +54,10 @@ public class CategoryAdapter extends RecyclerView.Adapter
         {
             String category = categories.get(i);
             ((CategoryViewHolder) viewHolder).name.setText(category);
+            if (selectedPos == RecyclerView.NO_POSITION)
+            {
+                selectedPos = i;
+            }
             ((CategoryViewHolder) viewHolder).itemView.setSelected(selectedPos == i);
         }
 
@@ -76,6 +80,7 @@ public class CategoryAdapter extends RecyclerView.Adapter
         else
             return categories.get(selectedPos);
     }
+
 
 
     @Override

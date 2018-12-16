@@ -21,6 +21,7 @@
             android:id="@+id/input_add_picture"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:adjustViewBounds="true"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/ic_add_a_photo_primary_24dp" />
 
@@ -189,7 +190,8 @@
             <EditText android:id="@+id/input_add_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
+                android:digits="0123456789."
+                android:inputType="numberDecimal"
                 android:hint="@string/add_input_price" />
         </android.support.design.widget.TextInputLayout>
 

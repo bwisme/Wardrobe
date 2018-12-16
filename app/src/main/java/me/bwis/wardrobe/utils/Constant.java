@@ -18,6 +18,7 @@ public class Constant
     public static final int CATEGORY_TYPE = 0;
     public static final int CATEGORY_SEASON = 1;
     public static final int CATEGORY_COLOR = 2;
+    public static final int CATEGORY_ALL_TYPE = 3;
 
     public static final int CATEGORY_FOOTER = 0;
     public static final int CATEGORY_ITEM = 1;

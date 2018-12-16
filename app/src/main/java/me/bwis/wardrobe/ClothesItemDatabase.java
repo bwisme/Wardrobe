@@ -22,99 +22,99 @@ public class ClothesItemDatabase implements ClothesItemContract.ClothesItemInter
     }
 
 
-
-    @Override
-    public List getClothesByType(String type) {
-        ArrayList<ClothesItem> output = new ArrayList<ClothesItem>();
-        Cursor result = db.query(ClothesItemEntry.TABLE_NAME, null,
-                ClothesItemEntry.COLUMN_NAME_TYPE+"=?", new String[]{type}, null, null, null);
-        result.moveToFirst();
-
-        while (result.moveToNext()) {
-            ClothesItem add = new ClothesItem();
-            add.id = result.getLong(result.getColumnIndex(ClothesItemEntry._ID));
-            add.name = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_CLOTHES_NAME));
-            add.photoPath = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_PHOTO_PATH));
-            add.type = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_TYPE));
-            add.storeLocation = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_STORE_LOCATION));
-            //add.colorType = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_COLOR_TYPE));
-            add.brand = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_BRAND));
-            add.price = result.getDouble(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_PRICE));
-            Cursor Season = getClothesById_Season(add.id);
-            Season.moveToFirst();
-            while (Season.moveToNext()) {
-                add.seasons.add(Season.getString(Season.getColumnIndex(ClothesSeasonEntry.COLUMN_NAME_SEASON)));
-            }
-            output.add(add);
-        }
-
-        db.close();
-
-        return output;
-    }
-
-    @Override
-    public List getClothesByColor(String colorType) {
-        ArrayList<ClothesItem> output = new ArrayList<ClothesItem>();
-        ArrayList<ClothesItem> colorList = new ArrayList<ClothesItem>();
-        ClothesItem add = new ClothesItem();
-        Cursor result = db.query("user", new String[]{"id", "name", "photoPath", "type", "color", "colorType", "storeLocation", "brand", "price"},
-                "colorType=colorType", new String[]{"1"}, null, null, null);
-        Cursor Season;
-        result.moveToFirst();
-
-        while (result.moveToNext()) {
-            add.id = result.getLong(result.getColumnIndex("id"));
-            add.name = result.getString(result.getColumnIndex("name"));
-            add.photoPath = result.getString(result.getColumnIndex("photoPath"));
-            add.type = result.getString(result.getColumnIndex("type"));
-            add.storeLocation = result.getString(result.getColumnIndex("storeLocation"));
-            add.colorType = result.getString(result.getColumnIndex("colorType"));
-            add.brand = result.getString(result.getColumnIndex("brand"));
-            add.price = result.getDouble(result.getColumnIndex("price"));
-            Season = getClothesById_Season(add.id);
-            Season.moveToFirst();
-            while (Season.moveToNext()) {
-                add.seasons.add(Season.getString(Season.getColumnIndex("season")));
-            }
-            output.add(add);
-        }
-
-        db.close();
-
-        return output;
-    }
-
-    @Override
-    public List getClothesBySeason(String season) {
-        ArrayList<ClothesItem> output = new ArrayList<ClothesItem>();
-        ClothesItem add = new ClothesItem();
-        Cursor se_result = db.query("id_Season", new String[]{"id", "season"}, "season=season",
-                new String[]{"1"}, null, null, null);
-        Cursor oth;
-        se_result.moveToFirst();
-        while (se_result.moveToNext()) {
-            add.id = se_result.getLong(se_result.getColumnIndex("id"));
-            oth = getClothesById(add.id);
-            add.name = oth.getString(oth.getColumnIndex("name"));
-            add.photoPath = oth.getString(oth.getColumnIndex("photoPath"));
-            add.type = oth.getString(oth.getColumnIndex("type"));
-            add.storeLocation = oth.getString(oth.getColumnIndex("storeLocation"));
-            add.colorType = oth.getString(oth.getColumnIndex("colorType"));
-            add.brand = oth.getString(oth.getColumnIndex("brand"));
-            add.price = oth.getDouble(oth.getColumnIndex("price"));
-            oth = getClothesById_Season(add.id);
-            oth.moveToFirst();
-            while (oth.moveToNext()) {
-                add.seasons.add(oth.getString(oth.getColumnIndex("season")));
-            }
-            output.add(add);
-        }
-
-        db.close();
-
-        return output;
-    }
+//
+//    @Override
+//    public List getClothesByType(String type) {
+//        ArrayList<ClothesItem> output = new ArrayList<ClothesItem>();
+//        Cursor result = db.query(ClothesItemEntry.TABLE_NAME, null,
+//                ClothesItemEntry.COLUMN_NAME_TYPE+"=?", new String[]{type}, null, null, null);
+//        result.moveToFirst();
+//
+//        while (result.moveToNext()) {
+//            ClothesItem add = new ClothesItem();
+//            add.id = result.getLong(result.getColumnIndex(ClothesItemEntry._ID));
+//            add.name = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_CLOTHES_NAME));
+//            add.photoPath = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_PHOTO_PATH));
+//            add.type = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_TYPE));
+//            add.storeLocation = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_STORE_LOCATION));
+//            //add.colorType = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_COLOR_TYPE));
+//            add.brand = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_BRAND));
+//            add.price = result.getDouble(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_PRICE));
+//            Cursor Season = getClothesById_Season(add.id);
+//            Season.moveToFirst();
+//            while (Season.moveToNext()) {
+//                add.seasons.add(Season.getString(Season.getColumnIndex(ClothesSeasonEntry.COLUMN_NAME_SEASON)));
+//            }
+//            output.add(add);
+//        }
+//
+//        db.close();
+//
+//        return output;
+//    }
+//
+//    @Override
+//    public List getClothesByColor(String colorType) {
+//        ArrayList<ClothesItem> output = new ArrayList<ClothesItem>();
+//        ArrayList<ClothesItem> colorList = new ArrayList<ClothesItem>();
+//        ClothesItem add = new ClothesItem();
+//        Cursor result = db.query("user", new String[]{"id", "name", "photoPath", "type", "color", "colorType", "storeLocation", "brand", "price"},
+//                "colorType=colorType", new String[]{"1"}, null, null, null);
+//        Cursor Season;
+//        result.moveToFirst();
+//
+//        while (result.moveToNext()) {
+//            add.id = result.getLong(result.getColumnIndex("id"));
+//            add.name = result.getString(result.getColumnIndex("name"));
+//            add.photoPath = result.getString(result.getColumnIndex("photoPath"));
+//            add.type = result.getString(result.getColumnIndex("type"));
+//            add.storeLocation = result.getString(result.getColumnIndex("storeLocation"));
+//            add.colorType = result.getString(result.getColumnIndex("colorType"));
+//            add.brand = result.getString(result.getColumnIndex("brand"));
+//            add.price = result.getDouble(result.getColumnIndex("price"));
+//            Season = getClothesById_Season(add.id);
+//            Season.moveToFirst();
+//            while (Season.moveToNext()) {
+//                add.seasons.add(Season.getString(Season.getColumnIndex("season")));
+//            }
+//            output.add(add);
+//        }
+//
+//        db.close();
+//
+//        return output;
+//    }
+//
+//    @Override
+//    public List getClothesBySeason(String season) {
+//        ArrayList<ClothesItem> output = new ArrayList<ClothesItem>();
+//        ClothesItem add = new ClothesItem();
+//        Cursor se_result = db.query("id_Season", new String[]{"id", "season"}, "season=season",
+//                new String[]{"1"}, null, null, null);
+//        Cursor oth;
+//        se_result.moveToFirst();
+//        while (se_result.moveToNext()) {
+//            add.id = se_result.getLong(se_result.getColumnIndex("id"));
+//            oth = getClothesById(add.id);
+//            add.name = oth.getString(oth.getColumnIndex("name"));
+//            add.photoPath = oth.getString(oth.getColumnIndex("photoPath"));
+//            add.type = oth.getString(oth.getColumnIndex("type"));
+//            add.storeLocation = oth.getString(oth.getColumnIndex("storeLocation"));
+//            add.colorType = oth.getString(oth.getColumnIndex("colorType"));
+//            add.brand = oth.getString(oth.getColumnIndex("brand"));
+//            add.price = oth.getDouble(oth.getColumnIndex("price"));
+//            oth = getClothesById_Season(add.id);
+//            oth.moveToFirst();
+//            while (oth.moveToNext()) {
+//                add.seasons.add(oth.getString(oth.getColumnIndex("season")));
+//            }
+//            output.add(add);
+//        }
+//
+//        db.close();
+//
+//        return output;
+//    }
 
     public List getClothesBy(String columnName, String value)
     {
@@ -146,6 +146,7 @@ public class ClothesItemDatabase implements ClothesItemContract.ClothesItemInter
             add.photoPath = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_PHOTO_PATH));
             add.type = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_TYPE));
             add.storeLocation = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_STORE_LOCATION));
+            add.color = result.getInt(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_COLOR));
             //add.colorType = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_COLOR_TYPE));
             add.brand = result.getString(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_BRAND));
             add.price = result.getDouble(result.getColumnIndex(ClothesItemEntry.COLUMN_NAME_PRICE));
@@ -166,18 +167,16 @@ public class ClothesItemDatabase implements ClothesItemContract.ClothesItemInter
 
 
     @Override
-    public Cursor getClothesById(long id) {
-        Cursor result = db.query("user", new String[]{"id", "name", "photoPath", "type", "color", "colorType", "storeLocation", "brand", "price"},
-                "id=id", new String[]{"1"}, null, null, null);
-        return result;
+    public List getClothesById(long id) {
+        return getClothesBy(ClothesItemEntry._ID, Long.toString(id));
     }
 
-    @Override
-    public Cursor getClothesById_Season(long id) {
-        Cursor result = db.query("id_Season", new String[]{"id", "season"}, "id=id",
-                new String[]{"1"}, null, null, null);
-        return result;
-    }
+//    @Override
+//    public Cursor getClothesById_Season(long id) {
+//        Cursor result = db.query("id_Season", new String[]{"id", "season"}, "id=id",
+//                new String[]{"1"}, null, null, null);
+//        return result;
+//    }
 
 
     @Override
@@ -186,7 +185,6 @@ public class ClothesItemDatabase implements ClothesItemContract.ClothesItemInter
             db = dbHelper.getWritableDatabase();
         db.delete(ClothesItemEntry.TABLE_NAME, ClothesItemEntry._ID+"=?", new String[]{Long.toString(id)});
         db.delete(ClothesSeasonEntry.TABLE_NAME, ClothesSeasonEntry._ID+"=?", new String[]{Long.toString(id)});
-        db.close();
     }
 
 

@@ -63,5 +63,9 @@
     <string name="follow">Follow</string>
     <string name="dialog_new_type_title">New Type</string>
     <string name="dialog_rename_type_title">New Name</string>
+    <string name="delete">Delete</string>
+    <string name="closet_select_all_type">Show all types</string>
+    <string name="title_modify_clothes">Modify Clothes</string>
+
 
 </resources>

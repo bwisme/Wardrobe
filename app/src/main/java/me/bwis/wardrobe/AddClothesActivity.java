@@ -53,14 +53,16 @@ import static me.bwis.wardrobe.ClothesItemContract.ClothesItemEntry;
 
 public class AddClothesActivity extends AppCompatActivity {
 
-    private View.OnClickListener mAddPictureButtonOnClickListener;
-    private View.OnClickListener mSelectColorButtonOnClickListener;
-    private ImageView mClothesImageView;
-    private View mColorSelectedView;
-    private MaterialButton mSelectColorButton;
-    private ColorPicker mColorPicker;
-    private boolean hasLoadedPicture;
-    private int mSelectedColor;
+    protected View.OnClickListener mAddPictureButtonOnClickListener;
+    protected View.OnClickListener mSelectColorButtonOnClickListener;
+    protected ImageView mClothesImageView;
+    protected View mColorSelectedView;
+    protected MaterialButton mSelectColorButton;
+    protected ColorPicker mColorPicker;
+    protected boolean hasLoadedPicture;
+    protected Spinner mTypeSpinner;
+    protected int mSelectedColor;
+    protected long mCurrentClothesID;
 
 
 
@@ -76,10 +78,11 @@ public class AddClothesActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         hasLoadedPicture = false;
-        mColorPicker = new ColorPicker(AddClothesActivity.this, 62,39,35);
+        mColorPicker = new ColorPicker(this, 62,39,35);
         mClothesImageView = findViewById(R.id.input_add_picture);
         mColorSelectedView = findViewById(R.id.input_color_selected);
         mSelectColorButton = findViewById(R.id.button_choose_color);
+        mCurrentClothesID = System.currentTimeMillis();
         if (initOnClickListeners())
         {
             mClothesImageView.setOnClickListener(mAddPictureButtonOnClickListener);
@@ -164,7 +167,7 @@ public class AddClothesActivity extends AppCompatActivity {
         checkSummer = (CheckBox) findViewById(R.id.add_checkbox_summer);
         checkAutumn = (CheckBox) findViewById(R.id.add_checkbox_autumn);
         checkWinter = (CheckBox) findViewById(R.id.add_checkbox_winter);
-        inColor = (Button) findViewById(R.id.button_choose_color);
+
         inStore = (EditText) findViewById(R.id.input_add_store_location);
         inBrand = (EditText) findViewById(R.id.input_add_brand);
         inPrice = (EditText) findViewById(R.id.input_add_price);
@@ -182,17 +185,17 @@ public class AddClothesActivity extends AppCompatActivity {
             return;
         }
 
-        Long currentID = System.currentTimeMillis();
+
 
 
         ContentValues values = new ContentValues();
         ClothesItemDBHelper dbHelper = new ClothesItemDBHelper(getApplication());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        values.put(ClothesItemEntry._ID,currentID);
+        values.put(ClothesItemEntry._ID, mCurrentClothesID);
         values.put(ClothesItemEntry.COLUMN_NAME_CLOTHES_NAME,inName.getText().toString());
         values.put(ClothesItemEntry.COLUMN_NAME_TYPE,inType.getSelectedItem().toString());
-        values.put(ClothesItemEntry.COLUMN_NAME_PHOTO_PATH,mCurrentPhotoPath);
+        values.put(ClothesItemEntry.COLUMN_NAME_PHOTO_PATH, this.mCurrentPhotoPath);
 
         values.put(ClothesItemEntry.COLUMN_NAME_COLOR,mSelectedColor);
         // TODO 缺少colorType
@@ -210,7 +213,7 @@ public class AddClothesActivity extends AppCompatActivity {
         if(checkSpring.isChecked())
         {
             values = new ContentValues();
-            values.put(ClothesSeasonEntry._ID,currentID);
+            values.put(ClothesSeasonEntry._ID,mCurrentClothesID);
             values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Spring");
             db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
         }
@@ -218,28 +221,28 @@ public class AddClothesActivity extends AppCompatActivity {
         if (checkSpring.isChecked())
         {
             values = new ContentValues();
-            values.put(ClothesSeasonEntry._ID, currentID);
+            values.put(ClothesSeasonEntry._ID, mCurrentClothesID);
             values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Spring");
             db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
         }
         if (checkSummer.isChecked())
         {
             values = new ContentValues();
-            values.put(ClothesSeasonEntry._ID, currentID);
+            values.put(ClothesSeasonEntry._ID, mCurrentClothesID);
             values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Summer");
             db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
         }
         if (checkAutumn.isChecked())
         {
             values = new ContentValues();
-            values.put(ClothesSeasonEntry._ID, currentID);
+            values.put(ClothesSeasonEntry._ID, mCurrentClothesID);
             values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Autumn");
             db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
         }
         if (checkWinter.isChecked())
         {
             values = new ContentValues();
-            values.put(ClothesSeasonEntry._ID, currentID);
+            values.put(ClothesSeasonEntry._ID, mCurrentClothesID);
             values.put(ClothesSeasonEntry.COLUMN_NAME_SEASON, "Winter");
             db.insert(ClothesSeasonEntry.TABLE_NAME,null,values);
         }
@@ -468,14 +471,14 @@ public class AddClothesActivity extends AppCompatActivity {
 
     protected void addItemsToTypeSpinner()
     {
-        Spinner spinner = findViewById(R.id.input_add_type_spinner);
+        mTypeSpinner = findViewById(R.id.input_add_type_spinner);
         ArrayList<String> list = new ArrayList<String>();
         list.addAll(SharedPreferenceUtils.getStringSet(Constant.PREF_TYPE_SET, Res.TYPE_SET));
         java.util.Collections.sort(list);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                 list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        mTypeSpinner.setAdapter(adapter);
     }
 
 

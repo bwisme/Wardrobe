@@ -64,13 +64,13 @@ public class ClothesItemContract
     public interface ClothesItemInterface
     {
 
-        List getClothesByType(String type);
-        List getClothesByColor(String colorType);
-        List getClothesBySeason(String season);
-        Cursor getClothesById(long id);
+//        List getClothesByType(String type);
+//        List getClothesByColor(String colorType);
+//        List getClothesBySeason(String season);
+        List getClothesById(long id);
 
         void deleteClothes(long id);
-        Cursor getClothesById_Season(long id);
+//        Cursor getClothesById_Season(long id);
 
     }
 

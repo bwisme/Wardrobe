@@ -28,6 +28,7 @@ public class WardrobeApplication extends Application
         AVOSCloud.setDebugLogEnabled(true);
         SharedPreferenceUtils.setInstance(getApplicationContext().getSharedPreferences(Constant.PREF_FILE, MODE_PRIVATE));
         ApplicationState.IS_LOGGED_IN = false;
+        ApplicationState.IS_SHOWING_ALL_TYPE = false;
         ApplicationState.CURRENT_CATEGORY = SharedPreferenceUtils.instance.getInt(Constant.PREF_CATEGORY, Constant.CATEGORY_TYPE);
         initPreferences();
     }
@@ -80,6 +81,7 @@ public class WardrobeApplication extends Application
     {
         public static boolean IS_LOGGED_IN;
         public static int CURRENT_CATEGORY;
+        public static boolean IS_SHOWING_ALL_TYPE;
     }
 
     private void initLoginState()

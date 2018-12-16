@@ -33,6 +33,12 @@
             android:windowSoftInputMode="stateHidden">
         </activity>
 
+        <activity
+            android:name=".ModifyClothesActivity"
+            android:label="@string/title_modify_clothes"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+
 
 
         <provider

@@ -44,6 +44,9 @@ public class ClosetFragment extends Fragment {
     private ClothesItemAdapter mClothesItemAdapter;
     private CategoryAdapter mCategoryAdapter;
     private ClothesItemDatabase mClothesItemDatabase;
+    private Menu mMenu;
+    private MenuItem mShowAllType;
+
 
     public ClosetFragment() {
         // Required empty public constructor
@@ -78,7 +81,6 @@ public class ClosetFragment extends Fragment {
         mCategoryAdapter = new CategoryAdapter(categories, this);
 
         updateCategories();
-
         onSwitchData();
         mCategoryRecyclerView.setAdapter(mCategoryAdapter);
         mClothesRecyclerView.setAdapter(mClothesItemAdapter);
@@ -94,6 +96,8 @@ public class ClosetFragment extends Fragment {
     {
 
         inflater.inflate(R.menu.closet_options, menu);
+        mMenu = menu;
+        mShowAllType = mMenu.findItem(R.id.closet_option_all_type);
         super.onCreateOptionsMenu(menu, inflater);
 
     }
@@ -104,6 +108,8 @@ public class ClosetFragment extends Fragment {
     {
         switch (item.getItemId())
         {
+
+
             case R.id.closet_option_by_type:
                 if (WardrobeApplication.ApplicationState.CURRENT_CATEGORY
                         == Constant.CATEGORY_TYPE)
@@ -125,18 +131,100 @@ public class ClosetFragment extends Fragment {
                 WardrobeApplication.ApplicationState.CURRENT_CATEGORY
                         = Constant.CATEGORY_SEASON;
                 break;
+            case R.id.closet_option_all_type:
+                WardrobeApplication.ApplicationState.IS_SHOWING_ALL_TYPE = !WardrobeApplication.ApplicationState.IS_SHOWING_ALL_TYPE;
+                if (WardrobeApplication.ApplicationState.IS_SHOWING_ALL_TYPE)
+                {
+                    mShowAllType.setTitle("Show fewer types");
+                }
+                else
+                {
+                    mShowAllType.setTitle(R.string.closet_select_all_type);
+                }
+                updateCategories();
+                break;
+            case R.id.action_closet_delete:
+
+                mClothesItemAdapter.isInMultiSelectMode = !mClothesItemAdapter.isInMultiSelectMode;
+                if (mClothesItemAdapter.isInMultiSelectMode)
+                {
+                    mMenu.findItem(R.id.action_closet_delete_confirm).setVisible(true);
+
+
+                }
+                else
+                {
+                    mMenu.findItem(R.id.action_closet_delete_confirm).setVisible(false);
+
+                    mClothesItemAdapter.clearSelectedState();
+                }
+                mClothesItemAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.action_closet_delete_confirm:
+                onDeleteSelectedClothes();
+
+                return true;
         }
         updateCategories();
         onSwitchData();
         return true;
     }
 
+    private void onDeleteSelectedClothes()
+    {
+        List<ClothesItem> items = mClothesItemAdapter.getSelectedItems();
+        if (items.isEmpty())
+        {
+            mMenu.findItem(R.id.action_closet_delete_confirm).setVisible(false);
+            mClothesItemAdapter.isInMultiSelectMode = false;
+            mClothesItemAdapter.clearSelectedState();
+            mClothesItemAdapter.notifyDataSetChanged();
+
+            return;
+        }
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this.getActivity());
+        builder.setTitle("Confirm?");
+        builder.setMessage("These data will be deleted forever!");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+                List<ClothesItem> items = mClothesItemAdapter.getSelectedItems();
+                Log.d("onDeleteSelectedClothes", "items to be deleted size:"+Integer.toString(items.size()));
+                for (ClothesItem item : items)
+                {
+                    mClothesItemDatabase.deleteClothes(item.id);
+                }
+
+                mMenu.findItem(R.id.action_closet_delete_confirm).setVisible(false);
+                mClothesItemAdapter.isInMultiSelectMode = false;
+                updateCategories();
+                mClothesItemAdapter.notifyDataSetChanged();
+                onSwitchData();
+
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+
+
+
+    }
+
     public void onSwitchData()
     {
         //fetch data
+        mClothesItemAdapter.clearSelectedState();
         String category = mCategoryAdapter.getSelectedCategory();
         if (category == "")
+        {
+            items.clear();
+            mClothesItemAdapter.notifyDataSetChanged();
             return;
+        }
 
         List data = new ArrayList<>();
         Log.d("onSwitchData", "CURRENT_CATEGORY:"+
@@ -155,23 +243,30 @@ public class ClosetFragment extends Fragment {
                 data = mClothesItemDatabase.getClothesBy(
                         ClothesItemContract.ClothesItemEntry.COLUMN_NAME_COLOR_TYPE,category);
                 break;
+
         }
         Log.d("onSwitchData", "dataset size:"+Integer.toString(data.size()));
         items.clear();
         items.addAll(data);
 //        mClothesItemAdapter = new ClothesItemAdapter(items);
 //        mClothesRecyclerView.swapAdapter(mClothesItemAdapter, true);
+
         mClothesItemAdapter.notifyDataSetChanged();
 
     }
 
     private void updateCategories()
     {
+        int currentPos = mCategoryAdapter.selectedPos;
+        Log.d("updateCategories", "currentPos"+Integer.toString(currentPos));
         categories.clear();
         switch (WardrobeApplication.ApplicationState.CURRENT_CATEGORY)
         {
             case Constant.CATEGORY_TYPE:
-                categories.addAll(mClothesItemDatabase.getTypes());
+                if (WardrobeApplication.ApplicationState.IS_SHOWING_ALL_TYPE)
+                    categories.addAll(Res.TYPE_SET);
+                else
+                    categories.addAll(mClothesItemDatabase.getTypes());
                 break;
             case Constant.CATEGORY_COLOR:
                 categories.addAll(Constant.COLOR_LIST);
@@ -181,8 +276,24 @@ public class ClosetFragment extends Fragment {
                 break;
         }
         if (!categories.isEmpty())
-            mCategoryAdapter.selectedPos = 0;
+        {
+            if (currentPos >= categories.size())
+            {
+                mCategoryAdapter.selectedPos = (categories.size() - 1 > 0) ? categories.size()-1:0;
+            }
+            else if (currentPos != RecyclerView.NO_POSITION)
+            {
+                mCategoryAdapter.selectedPos = currentPos;
+            }
+            else
+                mCategoryAdapter.selectedPos = 0;
+        }
+        else
+        {
+            mCategoryAdapter.selectedPos = RecyclerView.NO_POSITION;
+        }
         mCategoryAdapter.notifyDataSetChanged();
+        Log.d("updateCategories", "selectedPos"+Integer.toString(mCategoryAdapter.selectedPos));
 
     }
 
