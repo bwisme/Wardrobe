@@ -20,10 +20,14 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.TimeLi
 {
 
     private List<AVStatus> timelineItems;
+    private CommunityFragment fragment;
+    private boolean isMyPost;
 
-    public TimelineAdapter(List<AVStatus> timelineItems)
+    public TimelineAdapter(List<AVStatus> timelineItems, CommunityFragment fragment, boolean isMyPost)
     {
         this.timelineItems = timelineItems;
+        this.fragment = fragment;
+        this.isMyPost = isMyPost;
     }
 
     @NonNull
@@ -50,6 +54,22 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.TimeLi
             public void onClick(View v)
             {
                 Log.d("TimelineAdapter", "username:"+status.getSource().getUsername());
+            }
+        });
+
+
+        timeLineViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v)
+            {
+                if (isMyPost)
+                {
+                    fragment.onLongClickMyPost(status);
+                    return true;
+                }
+                else
+                    return false;
+
             }
         });
     }
