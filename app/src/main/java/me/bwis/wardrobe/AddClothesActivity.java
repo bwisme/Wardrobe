@@ -201,7 +201,16 @@ public class AddClothesActivity extends AppCompatActivity {
         values.put(ClothesItemEntry.COLUMN_NAME_COLOR_TYPE, Constant.getNearestColorName(mSelectedColor));
         values.put(ClothesItemEntry.COLUMN_NAME_STORE_LOCATION,inStore.getText().toString());
         values.put(ClothesItemEntry.COLUMN_NAME_BRAND,inBrand.getText().toString());
-        values.put(ClothesItemEntry.COLUMN_NAME_PRICE,Double.parseDouble(inPrice.getText().toString()));
+        double price = 0;
+        try
+        {
+            price = Double.parseDouble(inPrice.getText().toString());
+        }
+        catch (Exception e)
+        {
+            price = 0;
+        }
+        values.put(ClothesItemEntry.COLUMN_NAME_PRICE, price);
 
         long ret = db.insert(ClothesItemEntry.TABLE_NAME,null,values);
         Log.d("AddClothesActivity", "add:"+Long.toString(ret));

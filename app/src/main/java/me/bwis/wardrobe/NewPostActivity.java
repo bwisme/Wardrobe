@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -24,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
@@ -32,6 +34,7 @@ import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.ProgressCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
+import com.squareup.picasso.Picasso;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -98,82 +101,18 @@ public class NewPostActivity extends AppCompatActivity
                 onBackPressed();
                 return true;
             case R.id.action_done:
-                try
-                {
-                    onNewPostDone();
-                }
-                catch (IOException e)
-                {
-                    Log.e("OnNewPostDone", e.getMessage());
-                }
-
+                onNewPostDone();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void onNewPostDone() throws FileNotFoundException
+    private void onNewPostDone()
     {
         // post to server
         if (hasLoadedPicture)
         {
-            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
-
-            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            File image = null;
-
-            try
-            {
-                image = File.createTempFile(
-                        "WRDB_POST_TEMP",  /* prefix */
-                        ".png",         /* suffix */
-                        storageDir      /* directory */
-
-                );
-                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(image));
-                bitmap.compress(Bitmap.CompressFormat.PNG, 30, bos);
-                bos.flush();
-                bos.close();
-
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            Log.i("OnNewPostDone", "Picture Compress finished");
-            final AVFile file = AVFile.withAbsoluteLocalPath(
-                    AVUser.getCurrentUser().getUsername()+"_Post_"+Long.toString(System.currentTimeMillis())+".png"
-                    , image.getAbsolutePath());
-            final String[] picURL = new String[1];
-            mProgressBar.setVisibility(View.VISIBLE);
-            file.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(AVException e) {
-                    if (e == null)
-                    {
-                        picURL[0] = file.getUrl();
-                        Log.d("OnNewPostDone", file.getUrl());//返回一个唯一的 Url 地址
-                        if (!picURL[0].isEmpty())
-                        {
-
-                            AVStatus status = AVStatus.createStatus(picURL[0], mEditText.getText().toString());
-                            status.setInboxType(AVStatus.INBOX_TYPE.TIMELINE.toString());
-                            AVStatus.sendStatusToFollowersInBackgroud(status, new SaveCallback() {
-                                @Override
-                                public void done(AVException avException) {
-                                    Log.i("OnNewPostDone", "Send status finished.");
-                                }
-                            });
-                        }
-                    }
-                }
-            }, new ProgressCallback() {
-                @Override
-                public void done(Integer integer) {
-                    mProgressBar.setProgress(integer);
-                }
-            });
-
-
+            new UploadTask().execute();
         }
 
         this.finish();
@@ -393,6 +332,95 @@ public class NewPostActivity extends AppCompatActivity
         int bytesRead;
         while ((bytesRead = input.read(buffer)) != -1) {
             output.write(buffer, 0, bytesRead);
+        }
+    }
+
+    private class UploadTask extends AsyncTask<Void, Void, Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... voids)
+        {
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File image = null;
+
+            try
+            {
+
+                // 设置参数
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true; // 只获取图片的大小信息，而不是将整张图片载入在内存中，避免内存溢出
+                BitmapFactory.decodeFile(mCurrentPhotoPath, options);
+                int height = options.outHeight;
+                int width= options.outWidth;
+                int inSampleSize = 2; // 默认像素压缩比例，压缩为原图的1/2
+                int minLen = Math.min(height, width); // 原图的最小边长
+                if(minLen > 400) { // 如果原始图像的最小边长大于100dp（此处单位我认为是dp，而非px）
+                    float ratio = (float)minLen / 400.0f; // 计算像素压缩比例
+                    inSampleSize = (int)ratio;
+                }
+                options.inJustDecodeBounds = false; // 计算好压缩比例后，这次可以去加载原图了
+                options.inSampleSize = inSampleSize; // 设置为刚才计算的压缩比例
+                Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, options); // 解码文件
+
+
+                image = File.createTempFile(
+                        "WRDB_POST_TEMP",  /* prefix */
+                        ".png",         /* suffix */
+                        storageDir      /* directory */
+
+                );
+                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(image));
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+
+                bos.flush();
+                bos.close();
+
+
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+                return null;
+            }
+            Log.i("OnNewPostDone", "Picture Compress finished");
+            final AVFile file;
+            try
+            {
+                file = AVFile.withAbsoluteLocalPath(
+                        AVUser.getCurrentUser().getUsername()+"_Post_"+Long.toString(System.currentTimeMillis())+".png"
+                        , image.getAbsolutePath());
+            } catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+                return null;
+            }
+            final String[] picURL = new String[1];
+            mProgressBar.setVisibility(View.VISIBLE);
+            file.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(AVException e) {
+                    if (e == null)
+                    {
+                        picURL[0] = file.getUrl();
+                        Log.d("OnNewPostDone", file.getUrl());//返回一个唯一的 Url 地址
+                        if (!picURL[0].isEmpty())
+                        {
+
+                            AVStatus status = AVStatus.createStatus(picURL[0], mEditText.getText().toString());
+                            status.setInboxType(AVStatus.INBOX_TYPE.TIMELINE.toString());
+                            AVStatus.sendStatusToFollowersInBackgroud(status, new SaveCallback() {
+                                @Override
+                                public void done(AVException avException) {
+                                    Log.i("OnNewPostDone", "Send status finished.");
+                                    Toast.makeText(getApplication(), "Send succeeded!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            return null;
         }
     }
 

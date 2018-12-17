@@ -25,8 +25,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.bwis.wardrobe.dummy.DummyAdapter;
-import me.bwis.wardrobe.dummy.DummyItem;
 import me.bwis.wardrobe.utils.Constant;
 import me.bwis.wardrobe.utils.Res;
 import me.bwis.wardrobe.utils.SharedPreferenceUtils;
