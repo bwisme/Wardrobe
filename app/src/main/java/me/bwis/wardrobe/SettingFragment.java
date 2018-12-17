@@ -1,6 +1,7 @@
 package me.bwis.wardrobe;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.button.MaterialButton;
 import android.support.v4.app.Fragment;
@@ -14,14 +15,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.avos.avoscloud.SignUpCallback;
 import com.avos.avoscloud.UpdatePasswordCallback;
 
 import org.w3c.dom.Text;
 
 import me.bwis.wardrobe.utils.Constant;
+import me.bwis.wardrobe.utils.Res;
 import me.bwis.wardrobe.utils.SharedPreferenceUtils;
 
 public class SettingFragment extends Fragment {
@@ -30,10 +34,14 @@ public class SettingFragment extends Fragment {
     private View.OnClickListener mLoginOnClickListener;
     private View.OnClickListener mFeedbackOnClickListener;
     private View.OnClickListener mHelpOnClickListener;
+    private View.OnClickListener mAboutOnClickListener;
 
     private View mLoginView;
     private View mLoginTextView;
     private View rootView;
+    private View mAboutView;
+    private View mFeedbackView;
+    private View mHelpView;
 
 
 
@@ -59,6 +67,9 @@ public class SettingFragment extends Fragment {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_setting, container, false);
         mLoginView = rootView.findViewById(R.id.settings_login);
+        mAboutView = rootView.findViewById(R.id.settings_about);
+        mFeedbackView = rootView.findViewById(R.id.settings_feedback);
+        mHelpView = rootView.findViewById(R.id.settings_help);
         TextView mLoginTextView = rootView.findViewById(R.id.settings_login_text);
         if (WardrobeApplication.ApplicationState.IS_LOGGED_IN)
             mLoginTextView.setText("Hello, "+AVUser.getCurrentUser().getUsername()+"!");
@@ -75,18 +86,99 @@ public class SettingFragment extends Fragment {
             public void onClick(View v)
             {
                 if (WardrobeApplication.ApplicationState.IS_LOGGED_IN)
-                {
                     showUserProfileDialog();
-                }
                 else
-                {
                     showLoginDialog();
-                }
-                    
-
             }
         };
         mLoginView.setOnClickListener(mLoginOnClickListener);
+
+        mAboutOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+                builder.setTitle("About Wardrobe");
+                builder.setMessage("An Android class project made by ZBW and LJY.");
+                builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+
+                    }
+                });
+
+                builder.show();
+            }};
+        mAboutView.setOnClickListener(mAboutOnClickListener);
+
+        mHelpOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+                builder.setTitle("Help");
+                builder.setMessage("Please refer to doc.");
+                builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+
+                    }
+                });
+
+                builder.show();
+            }};
+        mHelpView.setOnClickListener(mHelpOnClickListener);
+
+        mFeedbackOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                if (!WardrobeApplication.ApplicationState.IS_LOGGED_IN)
+                {
+                    Toast.makeText(getContext(), "Please login first", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                showFeedbackDialog();
+            }
+        };
+        mFeedbackView.setOnClickListener(mFeedbackOnClickListener);
+
+    }
+
+    private void showFeedbackDialog()
+    {
+
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
+        View mView = getLayoutInflater().inflate(R.layout.dialog_feedback, null);
+        final EditText mEditText = mView.findViewById(R.id.feedback_input);
+
+        MaterialButton mSend = mView.findViewById(R.id.feedback_send);
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+
+        mSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                AVObject feedback = new AVObject("Feedback");
+                feedback.put("content", mEditText.getText().toString());
+                feedback.put("userId", AVUser.getCurrentUser().getObjectId());
+                feedback.put("username", AVUser.getCurrentUser().getUsername());
+                feedback.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(AVException e) {
+                        if (e == null) {
+                            Toast.makeText(getActivity(), "Thank you for your feedback!", Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
     }
 
     private void showUserProfileDialog()

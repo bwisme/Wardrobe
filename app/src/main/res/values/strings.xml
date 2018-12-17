@@ -70,6 +70,7 @@
     <string name="please_login_at_setting_page">Please Login at Setting Page</string>
     <string name="empty">Empty</string>
     <string name="community_refresh">Refresh</string>
+    <string name="send">Send</string>
 
 
 </resources>
